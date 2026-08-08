@@ -76,7 +76,7 @@ public class CoffeePanel extends JPanel implements ActionListener {
 		grinder = new Grinder(500, 380);
 		espressoMachine = new EspressoMachine(790, 365);
 		portafilter = new Portafilter(190, 590);
-		cup = new Cup(790, 431);
+		cup = new Cup(790, 461);
 		pitcher = new Pitcher(300, COUNTER_Y - 30);
 		mug = new Mug(W_WIDTH / 2, COUNTER_Y + 90);
 

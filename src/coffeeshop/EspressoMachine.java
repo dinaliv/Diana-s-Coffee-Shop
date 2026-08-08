@@ -2,10 +2,13 @@ package coffeeshop;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 import javax.swing.Timer;
 
 public class EspressoMachine implements ActionListener {
@@ -15,13 +18,19 @@ public class EspressoMachine implements ActionListener {
 	private boolean shotReady = false;
 	private int shotCount = 0;
 	private Timer pullTimer;
+	private BufferedImage img;
 
 	private static final int BTN_W = 40;
-	private static final int BTN_H = 30;
+	private static final int BTN_H = 40;
 
 	public EspressoMachine(double x, double y) {
 		xPos = x;
 		yPos = y;
+		try {
+			img = ImageIO.read(getClass().getResourceAsStream("/assets/Espresso_Machine_ 2k.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void startPulling() {
@@ -41,71 +50,33 @@ public class EspressoMachine implements ActionListener {
 		int left = (int)(xPos - 100);
 		int top = (int)(yPos - 115);
 
-		//machine body
-		g2.setColor(Color.WHITE);
-		g2.fillRect(left, top, 200, 230);
-		g2.setColor(Color.BLACK);
-		g2.setStroke(new BasicStroke(2));
-		g2.drawRect(left, top, 200, 230);
-		g2.setStroke(new BasicStroke(1));
-
-		//shot buttons
-		String[] labels = {"1", "2", "3"};
-		for (int i = 0; i < 3; i++) {
-			int bx = left + 18 + i * 56;
-			int by = top + 35;
-			g2.setColor(Color.WHITE);
-			g2.fillRect(bx, by, BTN_W, BTN_H);
-			g2.setColor(Color.BLACK);
-			g2.drawRect(bx, by, BTN_W, BTN_H);
-			g2.setFont(new Font("Arial", Font.BOLD, 14));
-			g2.drawString(labels[i], bx + 13, by + 22);
+		if (img != null) {
+			g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+			g2.drawImage(img, left - 90, top - 70, 380, 437, null);
+			g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 		}
 
-		//portafilter basket dock 
-		int[] dockX = { left + 50, left + 150, left + 140, left + 60 };
-		int[] dockY = { top + 80, top + 80, top + 130, top + 130 };
-		g2.setColor(Color.WHITE);
-		g2.fillPolygon(dockX, dockY, 4);
-		g2.setColor(Color.BLACK);
-		g2.drawPolygon(dockX, dockY, 4);
-
-		//horizontal line inside dock
-		g2.drawLine(left + 55, top + 105, left + 145, top + 105);
-
-		//dripping coffee
+		// dripping coffee overlay when pulling shot
 		if (isPulling) {
+			g2.setColor(Color.BLACK);
 			g2.setStroke(new BasicStroke(3));
-			g2.drawLine(left + 83, top + 130, left + 83, top + 200);
-			g2.drawLine(left + 117, top + 130, left + 117, top + 200);
+			g2.drawLine(left + 83, top + 130, left + 83, top + 230);
+			g2.drawLine(left + 117, top + 130, left + 117, top + 230);
 			g2.setStroke(new BasicStroke(1));
 		}
-
-		//drip tray at the bottom
-		g2.setColor(Color.WHITE);
-		g2.fillRect(left + 30, top + 205, 140, 18);
-		g2.setColor(Color.BLACK);
-		g2.setStroke(new BasicStroke(2));
-		g2.drawRect(left + 30, top + 205, 140, 18);
-		g2.setStroke(new BasicStroke(1));
-
-		//steam wand
-		g2.setStroke(new BasicStroke(4));
-		g2.drawLine(left + 200, top + 60, left + 230, top + 60);
-		g2.drawLine(left + 230, top + 60, left + 230, top + 110);
-		g2.setStroke(new BasicStroke(1));
 	}
 
 	public int shotButtonClicked(double x, double y) {
 		if (!buttonsActive || isPulling) return 0;
 		int left = (int)(xPos - 100);
 		int top = (int)(yPos - 115);
-		for (int i = 0; i < 3; i++) {
-			int bx = left + 18 + i * 56;
-			int by = top + 35;
-			if (x >= bx && x <= bx + BTN_W && y >= by && y <= by + BTN_H)
-				return i + 1;
-		}
+		int bx1 = left + 10,  by1 = top + 28;
+		int bx2 = left + 66,  by2 = top + 28;
+		int bx3 = left + 122, by3 = top + 23;
+
+		if (x >= bx1 && x <= bx1 + BTN_W && y >= by1 && y <= by1 + BTN_H) return 1;
+		if (x >= bx2 && x <= bx2 + BTN_W && y >= by2 && y <= by2 + BTN_H) return 2;
+		if (x >= bx3 && x <= bx3 + BTN_W && y >= by3 && y <= by3 + BTN_H) return 3;
 		return 0;
 	}
 
@@ -130,16 +101,16 @@ public class EspressoMachine implements ActionListener {
 	}
 
 	public double getDockY() {
-		return yPos - 10;
+		return yPos + 20;
 	}
 
-	// tip of the steam wand 
+	// tip of the steam wand
 	public double getSteamWandX() {
-		return xPos + 130;
+		return xPos + 150;
 	}
 
 	public double getSteamWandY() {
-		return yPos - 5;
+		return yPos + 35;
 	}
 
 	public int getShotCount() {
