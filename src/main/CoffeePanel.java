@@ -37,16 +37,18 @@ public class CoffeePanel extends JPanel implements ActionListener {
 	private double mouseX, mouseY;
 
 	// state machine:
-	// 0 = welcome
-	// 1 = drag portafilter to grinder
-	// 2 = grinding coffee for 3 seconds
-	// 3 = drag the portafilter to the espresso machine
-	// 4 = ready to pull the espresso shot
-	// 5 = shot pulling
-	// 6 = shot poured into cup, drag pitcher to steam wand
-	// 7 = steaming milk for 3 seconds
-	// 8 = drag pitcher back to table
-	// 9 = pitcher back on table
+	// 0  = welcome screen
+	// 1  = drag portafilter to grinder
+	// 2  = grinding coffee for 3 seconds
+	// 3  = drag portafilter to espresso machine
+	// 4  = choose number of shots and press button
+	// 5  = pulling espresso shot (5 seconds)
+	// 6  = shot in cup, drag pitcher to steam wand
+	// 7  = steaming milk for 3 seconds
+	// 8  = drag pitcher back to table
+	// 9  = drag cup to mug to pour espresso
+	// 10 = drag pitcher to mug to pour steamed milk
+	// 11 = latte complete, end screen
 	private int state = 0;
 
 	private Grinder grinder;
