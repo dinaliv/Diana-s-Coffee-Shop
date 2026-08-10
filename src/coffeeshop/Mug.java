@@ -54,7 +54,7 @@ public class Mug {
 		}
 		if (hasEspresso) {
 			g2.setColor(new Color(80, 40, 10));
-			g2.fillOval((int)(xPos), (int)(yPos - 60), 40, 40);
+			g2.fillOval((int)(xPos - 17), (int)(yPos - 57), 48, 48);
 		}
 	}
 }
