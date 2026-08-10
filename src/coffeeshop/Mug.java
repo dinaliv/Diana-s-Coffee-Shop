@@ -1,18 +1,29 @@
 package coffeeshop;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 
 public class Mug {
 	private double xPos, yPos;
 	private boolean hasEspresso = false;
 	private boolean hasLatte = false;
+	private BufferedImage img;
+
 	public static final int R = 40;
+	private static final int IMG_SIZE = 240;
 
 	public Mug(double x, double y) {
 		xPos = x;
 		yPos = y;
+		try {
+			img = ImageIO.read(getClass().getResourceAsStream("/assets/latte-mug.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void addEspresso() {
@@ -36,20 +47,14 @@ public class Mug {
 	}
 
 	public void draw(Graphics2D g2) {
-		int cx = (int) xPos;
-		int cy = (int) yPos;
-
-		if (hasLatte) {
-			g2.setColor(Color.WHITE);
-			g2.fillOval(cx - R, cy - R, R * 2, R * 2);
-		} else if (hasEspresso) {
-			g2.setColor(Color.BLACK);
-			g2.fillOval(cx - R, cy - R, R * 2, R * 2);
+		if (img != null) {
+			g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+			g2.drawImage(img, (int)(xPos - IMG_SIZE / 2), (int)(yPos - IMG_SIZE / 2), IMG_SIZE, IMG_SIZE, null);
+			g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 		}
-
-		g2.setColor(Color.BLACK);
-		g2.setStroke(new BasicStroke(2));
-		g2.drawOval(cx - R, cy - R, R * 2, R * 2);
-		g2.setStroke(new BasicStroke(1));
+		if (hasEspresso) {
+			g2.setColor(new Color(80, 40, 10));
+			g2.fillOval((int)(xPos), (int)(yPos - 60), 40, 40);
+		}
 	}
 }

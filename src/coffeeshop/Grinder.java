@@ -51,11 +51,11 @@ public class Grinder implements ActionListener {
 
 	// where the portafilter snaps when placed under the hole
 	public double getDockX() {
-		return xPos;
+		return xPos - 5;
 	}
 
 	public double getDockY() {
-		return yPos + 56;
+		return yPos + 66;
 	}
 
 	public void draw(Graphics2D g2) {

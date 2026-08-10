@@ -1,20 +1,30 @@
 package coffeeshop;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 
 public class Cup {
 	private double xPos, yPos;
 	private boolean hasEspresso = false;
 	private boolean dragging = false;
+	private BufferedImage img;
 
 	private static final int CUP_W = 54;
 	private static final int CUP_H = 38;
+	private static final int IMG_SIZE = 160;
 
 	public Cup(double x, double y) {
 		xPos = x;
 		yPos = y;
+		try {
+			img = ImageIO.read(getClass().getResourceAsStream("/assets/espresso_shot_cup.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void addEspresso() {
@@ -37,19 +47,15 @@ public class Cup {
 	}
 
 	public void draw(Graphics2D g2) {
-		int x = (int)(xPos - CUP_W / 2);
-		int y = (int)(yPos - CUP_H / 2);
-
-		// half full when espresso has been pulled
-		if (hasEspresso) {
-			g2.setColor(Color.BLACK);
-			g2.fillRect(x + 2, y + CUP_H / 2, CUP_W - 4, CUP_H / 2 - 2);
+		if (img != null) {
+			g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+			g2.drawImage(img, (int)(xPos - IMG_SIZE / 2), (int)(yPos - IMG_SIZE / 2), IMG_SIZE, IMG_SIZE, null);
+			g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 		}
-
-		g2.setColor(Color.BLACK);
-		g2.setStroke(new BasicStroke(2));
-		g2.drawRect(x, y, CUP_W, CUP_H);
-		g2.setStroke(new BasicStroke(1));
+		if (hasEspresso) {
+			g2.setColor(new Color(80, 40, 10));
+			g2.fillRect((int)(xPos - 29), (int)(yPos), 35, 37);
+		}
 	}
 
 	public double getXPos() {

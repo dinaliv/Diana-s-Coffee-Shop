@@ -1,41 +1,37 @@
 package coffeeshop;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 
 public class Pitcher {
 	private double xPos, yPos;
 	private boolean dragging = false;
 	private boolean steamed = false;
+	private BufferedImage img;
 
 	private static final int W = 36;
 	private static final int H = 56;
+	private static final int IMG_SIZE = 140;
 
 	public Pitcher(double x, double y) {
 		xPos = x;
 		yPos = y;
+		try {
+			img = ImageIO.read(getClass().getResourceAsStream("/assets/pitcher.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void draw(Graphics2D g2) {
-		int cx = (int) xPos;
-		int cy = (int) yPos;
-
-		g2.setStroke(new BasicStroke(2));
-
-		// cylinder body
-		g2.setColor(Color.WHITE);
-		g2.fillRect(cx - W / 2, cy - H / 2 + 7, W, H - 7);
-		g2.setColor(Color.BLACK);
-		g2.drawRect(cx - W / 2, cy - H / 2 + 7, W, H - 7);
-
-		// top ellipse
-		g2.setColor(Color.WHITE);
-		g2.fillOval(cx - W / 2, cy - H / 2, W, 14);
-		g2.setColor(Color.BLACK);
-		g2.drawOval(cx - W / 2, cy - H / 2, W, 14);
-
-		g2.setStroke(new BasicStroke(1));
+		if (img != null) {
+			g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+			g2.drawImage(img, (int)(xPos - IMG_SIZE / 2), (int)(yPos - IMG_SIZE / 2), IMG_SIZE, IMG_SIZE, null);
+			g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+		}
 	}
 
 	public boolean clicked(double mx, double my) {

@@ -61,6 +61,7 @@ public class CoffeePanel extends JPanel implements ActionListener {
 
 	private LatteArt latteArt = new LatteArt();
 	private BufferedImage startBg;
+	private BufferedImage sceneBg;
 
 	private JFrame frame;
 
@@ -76,12 +77,13 @@ public class CoffeePanel extends JPanel implements ActionListener {
 		grinder = new Grinder(500, 380);
 		espressoMachine = new EspressoMachine(790, 365);
 		portafilter = new Portafilter(190, 590);
-		cup = new Cup(790, 461);
-		pitcher = new Pitcher(300, COUNTER_Y - 30);
-		mug = new Mug(W_WIDTH / 2, COUNTER_Y + 90);
+		cup = new Cup(810, 451);
+		pitcher = new Pitcher(300, COUNTER_Y);
+		mug = new Mug(W_WIDTH / 2 + 70, COUNTER_Y + 150);
 
 		try {
 			startBg = ImageIO.read(getClass().getResourceAsStream("/assets/Start-screen.png"));
+			sceneBg = ImageIO.read(getClass().getResourceAsStream("/assets/Background_.png"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -164,14 +166,16 @@ public class CoffeePanel extends JPanel implements ActionListener {
 	}
 
 	private void drawMainScene(Graphics2D g2) {
-		g2.setColor(Color.WHITE);
-		g2.fillRect(0, 0, W_WIDTH, W_HEIGHT);
-
-		// counter line
-		g2.setColor(Color.BLACK);
-		g2.setStroke(new BasicStroke(2));
-		g2.drawLine(0, COUNTER_Y, W_WIDTH, COUNTER_Y);
-		g2.setStroke(new BasicStroke(1));
+		if (sceneBg != null) {
+			g2.drawImage(sceneBg, 0, 0, W_WIDTH, W_HEIGHT, null);
+		} else {
+			g2.setColor(Color.WHITE);
+			g2.fillRect(0, 0, W_WIDTH, W_HEIGHT);
+			g2.setColor(Color.BLACK);
+			g2.setStroke(new BasicStroke(2));
+			g2.drawLine(0, COUNTER_Y, W_WIDTH, COUNTER_Y);
+			g2.setStroke(new BasicStroke(1));
+		}
 
 		grinder.draw(g2);
 		espressoMachine.draw(g2);
@@ -309,7 +313,7 @@ public class CoffeePanel extends JPanel implements ActionListener {
 			// pitcher docks at steam wand
 			if (state == 6 && pitcher.isDragging() && pitcher.hitSteamWand(espressoMachine)) {
 				pitcher.setXPos(espressoMachine.getSteamWandX());
-				pitcher.setYPos(espressoMachine.getSteamWandY() + 25);
+				pitcher.setYPos(espressoMachine.getSteamWandY() + 40);
 				steamEffect = new SteamEffect(
 					(float)(pitcher.getXPos() - 12),
 					(float)(pitcher.getYPos() - 58)

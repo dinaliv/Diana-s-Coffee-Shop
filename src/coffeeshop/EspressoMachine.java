@@ -58,10 +58,10 @@ public class EspressoMachine implements ActionListener {
 
 		// dripping coffee overlay when pulling shot
 		if (isPulling) {
-			g2.setColor(Color.BLACK);
+			g2.setColor(new Color(80, 40, 10));
 			g2.setStroke(new BasicStroke(3));
-			g2.drawLine(left + 83, top + 130, left + 83, top + 230);
-			g2.drawLine(left + 117, top + 130, left + 117, top + 230);
+			g2.drawLine(left + 98, top + 130, left + 98, top + 237);
+			g2.drawLine(left + 117, top + 130, left + 117, top + 237);
 			g2.setStroke(new BasicStroke(1));
 		}
 	}
@@ -101,7 +101,7 @@ public class EspressoMachine implements ActionListener {
 	}
 
 	public double getDockY() {
-		return yPos + 20;
+		return yPos + 40;
 	}
 
 	// tip of the steam wand
