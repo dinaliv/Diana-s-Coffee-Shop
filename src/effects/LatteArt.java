@@ -1,4 +1,4 @@
-package coffeeshop;
+package effects;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -28,8 +28,8 @@ public class LatteArt {
         g2.setStroke(stroke);
 
     }
-    
-    // layered hearts 
+
+    // layered hearts
     public void drawLatteArt(Graphics2D g2, float x, float y, float s) {
     	AffineTransform at = g2.getTransform();
         g2.translate(x, y);
@@ -39,6 +39,6 @@ public class LatteArt {
     		s *= 0.7;
     		drawLatteArt(g2, x, y, s);
     	}
-    	
+
     }
 }

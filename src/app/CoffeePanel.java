@@ -1,4 +1,4 @@
-package main;
+package app;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -19,14 +19,18 @@ import java.awt.event.MouseMotionAdapter;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.Timer;
-import coffeeshop.Cup;
-import coffeeshop.EspressoMachine;
-import coffeeshop.Grinder;
-import coffeeshop.LatteArt;
-import coffeeshop.Pitcher;
-import coffeeshop.Portafilter;
-import coffeeshop.Mug;
-import coffeeshop.SteamEffect;
+import drinkware.Cup;
+import drinkware.DraggableItem;
+import drinkware.Mug;
+import drinkware.Pitcher;
+import java.util.ArrayList;
+import effects.LatteArt;
+import effects.SteamEffect;
+import equipment.EspressoMachine;
+import equipment.Grinder;
+import equipment.Portafilter;
+import audio.MinimHelper;
+import ddf.minim.*;
 
 public class CoffeePanel extends JPanel implements ActionListener {
 	// eco points: custom-made image for start screen
@@ -59,11 +63,20 @@ public class CoffeePanel extends JPanel implements ActionListener {
 	private SteamEffect steamEffect;
 	private Mug mug;
 
+	private ArrayList<DraggableItem> draggables;
+
 	private LatteArt latteArt = new LatteArt();
 	private BufferedImage startBg;
 	private BufferedImage sceneBg;
+	private BufferedImage endBg;
 
 	private JFrame frame;
+
+	private Minim minim;
+	private AudioPlayer bgMusic;
+	private AudioPlayer clickSound;
+	private AudioPlayer steamSound;
+	private AudioPlayer grindSound;
 
 	private Timer timer;
 	private Timer steamCountdown;
@@ -81,12 +94,25 @@ public class CoffeePanel extends JPanel implements ActionListener {
 		pitcher = new Pitcher(300, COUNTER_Y);
 		mug = new Mug(W_WIDTH / 2 + 70, COUNTER_Y + 150);
 
+		draggables = new ArrayList<>();
+		draggables.add(portafilter);
+		draggables.add(cup);
+		draggables.add(pitcher);
+
 		try {
-			startBg = ImageIO.read(getClass().getResourceAsStream("/assets/Start-screen.png"));
+			startBg = ImageIO.read(getClass().getResourceAsStream("/assets/Start-screen4.png"));
 			sceneBg = ImageIO.read(getClass().getResourceAsStream("/assets/Background_.png"));
+			endBg = ImageIO.read(getClass().getResourceAsStream("/assets/restart_screen2.png"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		minim = new Minim(new MinimHelper());
+		bgMusic = minim.loadFile("background-music.mp3");
+		bgMusic.setGain(-15);
+		clickSound = minim.loadFile("button-press.mp3");
+		steamSound = minim.loadFile("steaming-milk.mp3");
+		grindSound = minim.loadFile("coffee-grinder.mp3");
 
 		addMouseListener(new MyMouseListener());
 		addMouseMotionListener(new MyMouseMotionListener());
@@ -112,57 +138,51 @@ public class CoffeePanel extends JPanel implements ActionListener {
 
 	private void drawWelcomeScreen(Graphics2D g2) {
 		if (startBg != null) {
+			g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 			g2.drawImage(startBg, 0, 0, W_WIDTH, W_HEIGHT, null);
+			g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+			latteArt.drawLatteArt(g2, 870, 510, 110);
 		} else {
 			g2.setColor(Color.WHITE);
 			g2.fillRect(0, 0, W_WIDTH, W_HEIGHT);
+			g2.setColor(Color.BLACK);
+			g2.setFont(new Font("Georgia", Font.BOLD, 54));
+			drawCentered(g2, "Diana's Coffee Shop", W_WIDTH / 2, 270);
+			g2.setFont(new Font("Georgia", Font.ITALIC, 18));
+			drawCentered(g2, "Grind, brew, steam — follow the steps to craft your own latte.", W_WIDTH / 2, 320);
+			int bw = 180, bh = 52;
+			int bx = W_WIDTH / 2 - bw / 2, by = 420;
+			g2.setStroke(new BasicStroke(2));
+			g2.drawRect(bx, by, bw, bh);
+			g2.setStroke(new BasicStroke(1));
+			g2.setFont(new Font("Georgia", Font.BOLD, 24));
+			drawCentered(g2, "Start", W_WIDTH / 2, by + 36);
 		}
-
-		g2.setColor(Color.BLACK);
-		g2.setFont(new Font("Georgia", Font.BOLD, 54));
-		drawCentered(g2, "Diana's Coffee Shop", W_WIDTH / 2, 270);
-
-		g2.setFont(new Font("Georgia", Font.ITALIC, 18));
-		drawCentered(g2, "Grind, brew, steam — follow the steps to craft your own latte.", W_WIDTH / 2, 320);
-
-		int bw = 180, bh = 52;
-		int bx = W_WIDTH / 2 - bw / 2, by = 420;
-		g2.setStroke(new BasicStroke(2));
-		g2.drawRect(bx, by, bw, bh);
-		g2.setStroke(new BasicStroke(1));
-		g2.setFont(new Font("Georgia", Font.BOLD, 24));
-		drawCentered(g2, "Start", W_WIDTH / 2, by + 36);
-
-		latteArt.drawLatteArt(g2, 870, 510, 110);
 	}
 
 	private void drawEndScreen(Graphics2D g2) {
-		g2.setColor(Color.WHITE);
-		g2.fillRect(0, 0, W_WIDTH, W_HEIGHT);
-
-		// completed mug with steamed milk and latte art
-		int mugCx = W_WIDTH / 2;
-		int mugCy = 165;
-		int mugR = 65;
-		g2.setColor(Color.WHITE);
-		g2.fillOval(mugCx - mugR, mugCy - mugR, mugR * 2, mugR * 2);
-		g2.setColor(Color.BLACK);
-		g2.setStroke(new BasicStroke(2));
-		g2.drawOval(mugCx - mugR, mugCy - mugR, mugR * 2, mugR * 2);
-		g2.setStroke(new BasicStroke(1));
-		latteArt.drawLatteArt(g2, mugCx, mugCy - 20, 43);
-
-		g2.setColor(Color.BLACK);
-		g2.setFont(new Font("Georgia", Font.BOLD, 54));
-		drawCentered(g2, "Your latte is ready!", W_WIDTH / 2, 310);
-
-		int bw = 180, bh = 52;
-		int bx = W_WIDTH / 2 - bw / 2, by = 420;
-		g2.setStroke(new BasicStroke(2));
-		g2.drawRect(bx, by, bw, bh);
-		g2.setStroke(new BasicStroke(1));
-		g2.setFont(new Font("Georgia", Font.BOLD, 24));
-		drawCentered(g2, "Restart", W_WIDTH / 2, by + 36);
+		if (endBg != null) {
+			g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+			g2.drawImage(endBg, 0, 0, W_WIDTH, W_HEIGHT, null);
+			g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+			latteArt.drawLatteArt(g2, W_WIDTH / 2 + 15, 115, 59);
+		} else {
+			g2.setColor(Color.WHITE);
+			g2.fillRect(0, 0, W_WIDTH, W_HEIGHT);
+			int mugCx = W_WIDTH / 2;
+			int mugCy = 165;
+			latteArt.drawLatteArt(g2, mugCx + 15, mugCy - 50, 59);
+			g2.setColor(Color.BLACK);
+			g2.setFont(new Font("Georgia", Font.BOLD, 54));
+			drawCentered(g2, "Your latte is ready!", W_WIDTH / 2, W_HEIGHT / 2 + 20);
+			int bw = 180, bh = 52;
+			int bx = W_WIDTH / 2 - bw / 2, by = W_HEIGHT / 2 + 55;
+			g2.setStroke(new BasicStroke(2));
+			g2.drawRect(bx, by, bw, bh);
+			g2.setStroke(new BasicStroke(1));
+			g2.setFont(new Font("Georgia", Font.BOLD, 24));
+			drawCentered(g2, "Restart", W_WIDTH / 2, by + 36);
+		}
 	}
 
 	private void drawMainScene(Graphics2D g2) {
@@ -179,19 +199,19 @@ public class CoffeePanel extends JPanel implements ActionListener {
 
 		grinder.draw(g2);
 		espressoMachine.draw(g2);
-		if (state < 10) {
-			cup.draw(g2);
-		}
 		portafilter.draw(g2);
 
+		if (state == 9 || state == 10) {
+			mug.draw(g2);
+		}
 		if (state >= 6) {
 			pitcher.draw(g2);
 		}
 		if (state == 7 && steamEffect != null) {
 			steamEffect.draw(g2);
 		}
-		if (state == 9 || state == 10) {
-			mug.draw(g2);
+		if (state < 10) {
+			cup.draw(g2);
 		}
 
 		drawInstructionBox(g2, getInstructionText(state));
@@ -245,6 +265,7 @@ public class CoffeePanel extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		// grinds appear in portafilter
 		if (state == 2 && grinder.isGrindDone()) {
+			grindSound.pause();
 			portafilter.setHasGrinds(true);
 			state = 3;
 		}
@@ -262,6 +283,7 @@ public class CoffeePanel extends JPanel implements ActionListener {
 
 		// steam countdown
 		if (state == 7 && steamDone) {
+			steamSound.pause();
 			state = 8;
 		}
 
@@ -274,6 +296,8 @@ public class CoffeePanel extends JPanel implements ActionListener {
 			// portafilter is draggable to grinder and to machine
 			if ((state == 1 || state == 3) && portafilter.clicked(e.getX(), e.getY())) {
 				portafilter.setDragging(true);
+				clickSound.rewind();
+				clickSound.play();
 			}
 			// cup is draggable to mug in state 9
 			if (state == 9 && cup.clicked(e.getX(), e.getY())) {
@@ -282,6 +306,8 @@ public class CoffeePanel extends JPanel implements ActionListener {
 			// pitcher is draggable to wand, back to table, and to mug
 			if ((state == 6 || state == 8 || state == 10) && pitcher.clicked(e.getX(), e.getY())) {
 				pitcher.setDragging(true);
+				clickSound.rewind();
+				clickSound.play();
 			}
 		}
 
@@ -291,6 +317,7 @@ public class CoffeePanel extends JPanel implements ActionListener {
 				portafilter.setXPos(grinder.getDockX());
 				portafilter.setYPos(grinder.getDockY());
 				grinder.startGrinding();
+				grindSound.loop();
 				state = 2;
 			}
 
@@ -298,6 +325,8 @@ public class CoffeePanel extends JPanel implements ActionListener {
 				portafilter.setXPos(espressoMachine.getDockX());
 				portafilter.setYPos(espressoMachine.getDockY());
 				espressoMachine.setButtonsActive(true);
+				clickSound.rewind();
+				clickSound.play();
 				state = 4;
 			}
 
@@ -313,10 +342,13 @@ public class CoffeePanel extends JPanel implements ActionListener {
 			// pitcher docks at steam wand
 			if (state == 6 && pitcher.isDragging() && pitcher.hitSteamWand(espressoMachine)) {
 				pitcher.setXPos(espressoMachine.getSteamWandX());
-				pitcher.setYPos(espressoMachine.getSteamWandY() + 40);
+				pitcher.setYPos(espressoMachine.getSteamWandY() + 50);
+				clickSound.rewind();
+				clickSound.play();
+				steamSound.loop();
 				steamEffect = new SteamEffect(
-					(float)(pitcher.getXPos() - 12),
-					(float)(pitcher.getYPos() - 58)
+					(float)(pitcher.getXPos() - 17),
+					(float)(pitcher.getYPos() - 68)
 				);
 				steamDone = false;
 				steamCountdown = new Timer(3000, new ActionListener() {
@@ -348,10 +380,17 @@ public class CoffeePanel extends JPanel implements ActionListener {
 			double x = e.getX(), y = e.getY();
 
 			if (state == 0 && isStartClicked(x, y)) {
+				clickSound.rewind();
+				clickSound.play();
 				state = 1;
+				bgMusic.loop();
 			}
 
 			if (state == 11 && isRestartClicked(x, y)) {
+				clickSound.rewind();
+				clickSound.play();
+				bgMusic.close();
+				minim.stop();
 				timer.stop();
 				frame.dispose();
 				new CoffeeApp("Diana's Coffee Shop");
@@ -360,6 +399,8 @@ public class CoffeePanel extends JPanel implements ActionListener {
 			if (state == 4) {
 				int shot = espressoMachine.shotButtonClicked(x, y);
 				if (shot > 0) {
+					clickSound.rewind();
+					clickSound.play();
 					espressoMachine.setShotCount(shot);
 					espressoMachine.startPulling();
 					state = 5;
@@ -368,36 +409,34 @@ public class CoffeePanel extends JPanel implements ActionListener {
 		}
 	}
 
+	private void applyDrag(DraggableItem item, double x, double y) {
+		if (item.isDragging()) {
+			item.setXPos(x);
+			item.setYPos(y);
+		}
+	}
+
 	private class MyMouseMotionListener extends MouseMotionAdapter {
 		@Override
 		public void mouseDragged(MouseEvent e) {
 			mouseX = e.getX();
 			mouseY = e.getY();
-			if (portafilter.isDragging()) {
-				portafilter.setXPos(mouseX);
-				portafilter.setYPos(mouseY);
-			}
-			if (cup.isDragging()) {
-				cup.setXPos(mouseX);
-				cup.setYPos(mouseY);
-			}
-			if (pitcher.isDragging()) {
-				pitcher.setXPos(mouseX);
-				pitcher.setYPos(mouseY);
+			for (DraggableItem item : draggables) {
+				applyDrag(item, mouseX, mouseY);
 			}
 			repaint();
 		}
 	}
 
 	private boolean isStartClicked(double x, double y) {
-		int bw = 180, bh = 52;
-		int bx = W_WIDTH / 2 - bw / 2, by = 420;
+		int bw = 180, bh = 55;
+		int bx = W_WIDTH / 2 - bw / 2, by = 318;
 		return x >= bx && x <= bx + bw && y >= by && y <= by + bh;
 	}
 
 	private boolean isRestartClicked(double x, double y) {
 		int bw = 180, bh = 52;
-		int bx = W_WIDTH / 2 - bw / 2, by = 420;
+		int bx = W_WIDTH / 2 - bw / 2, by = W_HEIGHT / 2 + 85;
 		return x >= bx && x <= bx + bw && y >= by && y <= by + bh;
 	}
 }

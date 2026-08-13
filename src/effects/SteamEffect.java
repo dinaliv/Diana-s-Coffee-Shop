@@ -1,4 +1,4 @@
-package coffeeshop;
+package effects;
 
 import java.awt.Color;
 import java.awt.Graphics2D;

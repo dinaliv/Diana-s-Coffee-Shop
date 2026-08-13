@@ -1,4 +1,4 @@
-package coffeeshop;
+package equipment;
 
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;

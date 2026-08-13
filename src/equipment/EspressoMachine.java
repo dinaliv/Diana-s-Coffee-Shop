@@ -1,4 +1,4 @@
-package coffeeshop;
+package equipment;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
