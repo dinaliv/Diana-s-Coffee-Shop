@@ -3,6 +3,7 @@ package audio;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
+/* helper for minim — resolves audio file paths and provides input streams */
 public class MinimHelper {
 
     public String sketchPath(String fileName) {

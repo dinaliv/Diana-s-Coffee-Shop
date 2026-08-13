@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
+/* milk pitcher — draggable, used for steaming milk and pouring into mug */
 public class Pitcher extends DraggableItem {
     private boolean steamed = false;
     private BufferedImage img;

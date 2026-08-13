@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
+/* small espresso cup — draggable, holds espresso shot, pours into mug */
 public class Cup extends DraggableItem {
     private boolean hasEspresso = false;
     private BufferedImage img;

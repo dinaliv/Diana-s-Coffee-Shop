@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
+/* latte mug — receives espresso and steamed milk to complete the drink */
 public class Mug {
 	private double xPos, yPos;
 	private boolean hasEspresso = false;

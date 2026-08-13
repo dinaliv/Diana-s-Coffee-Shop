@@ -2,6 +2,7 @@ package app;
 
 import javax.swing.JFrame;
 
+/* entry point — creates the window and launches the coffee shop game */
 public class CoffeeApp extends JFrame {
 	private static final long serialVersionUID = 1L;
 

@@ -6,6 +6,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import processing.core.PApplet;
 
+/* animated steam clouds drawn with perlin noise while milk is steaming */
 public class SteamEffect {
 	private static final int W = 24;
 	private static final int H = 37;

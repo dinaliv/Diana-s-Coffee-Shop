@@ -11,6 +11,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.Timer;
 
+/* espresso machine — pulls shots on a timer, provides steam wand dock point */
 public class EspressoMachine implements ActionListener {
 	private double xPos, yPos;
 	private boolean buttonsActive = false;

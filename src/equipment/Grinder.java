@@ -9,6 +9,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.Timer;
 
+/* coffee grinder — grinds beans on a timer when portafilter is docked */
 public class Grinder implements ActionListener {
 
 	private double xPos, yPos;

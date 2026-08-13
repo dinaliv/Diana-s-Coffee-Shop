@@ -20,18 +20,22 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 import drinkware.Cup;
+import drinkware.CoffeeItemFactory;
 import drinkware.DraggableItem;
+import drinkware.ItemFactory;
 import drinkware.Mug;
 import drinkware.Pitcher;
 import java.util.ArrayList;
 import effects.LatteArt;
 import effects.SteamEffect;
+import effects.SwingLeaf;
 import equipment.EspressoMachine;
 import equipment.Grinder;
 import equipment.Portafilter;
 import audio.MinimHelper;
 import ddf.minim.*;
 
+/* main game panel — manages state, drawing, user input, and sound */
 public class CoffeePanel extends JPanel implements ActionListener {
 	// eco points: custom-made image for start screen
 	public static final int W_WIDTH = 1050;
@@ -64,8 +68,10 @@ public class CoffeePanel extends JPanel implements ActionListener {
 	private Mug mug;
 
 	private ArrayList<DraggableItem> draggables;
+	private ItemFactory itemFactory;
 
 	private LatteArt latteArt = new LatteArt();
+	private SwingLeaf swingLeaf = new SwingLeaf();
 	private BufferedImage startBg;
 	private BufferedImage sceneBg;
 	private BufferedImage endBg;
@@ -89,10 +95,12 @@ public class CoffeePanel extends JPanel implements ActionListener {
 
 		grinder = new Grinder(500, 380);
 		espressoMachine = new EspressoMachine(790, 365);
-		portafilter = new Portafilter(190, 590);
-		cup = new Cup(810, 451);
-		pitcher = new Pitcher(300, COUNTER_Y);
 		mug = new Mug(W_WIDTH / 2 + 70, COUNTER_Y + 150);
+
+		itemFactory = new CoffeeItemFactory();
+		portafilter = (Portafilter) itemFactory.createItem("portafilter", 190, 590);
+		cup = (Cup) itemFactory.createItem("cup", 810, 451);
+		pitcher = (Pitcher) itemFactory.createItem("pitcher", 300, COUNTER_Y);
 
 		draggables = new ArrayList<>();
 		draggables.add(portafilter);
@@ -134,6 +142,7 @@ public class CoffeePanel extends JPanel implements ActionListener {
 		} else {
 			drawMainScene(g2);
 		}
+		if (state != 0) swingLeaf.draw(g2, W_WIDTH);
 	}
 
 	private void drawWelcomeScreen(Graphics2D g2) {
@@ -275,6 +284,8 @@ public class CoffeePanel extends JPanel implements ActionListener {
 			cup.addEspresso();
 			state = 6;
 		}
+
+		swingLeaf.update();
 
 		// steam animation
 		if (state == 7 && steamEffect != null) {

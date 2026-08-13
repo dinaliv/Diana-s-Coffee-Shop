@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
+/* portafilter — draggable tool that collects grinds and docks to the espresso machine */
 public class Portafilter extends DraggableItem {
     private double width = 60, height = 90;
     private boolean hasGrinds = false;

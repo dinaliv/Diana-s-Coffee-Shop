@@ -2,6 +2,7 @@ package drinkware;
 
 import java.awt.Graphics2D;
 
+/* abstract base for all draggable objects — holds position and drag state */
 public abstract class DraggableItem {
     protected double xPos, yPos;
     private boolean dragging;

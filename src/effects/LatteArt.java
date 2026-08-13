@@ -7,6 +7,7 @@ import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
 
+/* draws recursive layered heart latte art on the cup */
 public class LatteArt {
 
     public void drawHeart(Graphics2D g2, float x, float y, float s) {
