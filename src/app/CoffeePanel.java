@@ -29,6 +29,8 @@ import java.util.ArrayList;
 import effects.LatteArt;
 import effects.SteamEffect;
 import effects.SwingLeaf;
+import equipment.CoffeeEquipmentFactory;
+import equipment.EquipmentFactory;
 import equipment.EspressoMachine;
 import equipment.Grinder;
 import equipment.Portafilter;
@@ -37,7 +39,7 @@ import ddf.minim.*;
 
 /* main game panel — manages state, drawing, user input, and sound */
 public class CoffeePanel extends JPanel implements ActionListener {
-	// eco points: custom-made image for start screen
+	// eco points: all images are self-created
 	public static final int W_WIDTH = 1050;
 	public static final int W_HEIGHT = 750;
 	public static final int COUNTER_Y = 480;
@@ -69,12 +71,14 @@ public class CoffeePanel extends JPanel implements ActionListener {
 
 	private ArrayList<DraggableItem> draggables;
 	private ItemFactory itemFactory;
+	private EquipmentFactory equipmentFactory;
 
 	private LatteArt latteArt = new LatteArt();
 	private SwingLeaf swingLeaf = new SwingLeaf();
 	private BufferedImage startBg;
 	private BufferedImage sceneBg;
 	private BufferedImage endBg;
+	private BufferedImage beansBg;
 
 	private JFrame frame;
 
@@ -93,8 +97,9 @@ public class CoffeePanel extends JPanel implements ActionListener {
 		setPreferredSize(new Dimension(W_WIDTH, W_HEIGHT));
 		setBackground(Color.WHITE);
 
-		grinder = new Grinder(500, 380);
-		espressoMachine = new EspressoMachine(790, 365);
+		equipmentFactory = new CoffeeEquipmentFactory();
+		grinder = (Grinder) equipmentFactory.createEquipment("grinder", 500, 380);
+		espressoMachine = (EspressoMachine) equipmentFactory.createEquipment("espressomachine", 790, 365);
 		mug = new Mug(W_WIDTH / 2 + 70, COUNTER_Y + 150);
 
 		itemFactory = new CoffeeItemFactory();
@@ -111,6 +116,7 @@ public class CoffeePanel extends JPanel implements ActionListener {
 			startBg = ImageIO.read(getClass().getResourceAsStream("/assets/Start-screen4.png"));
 			sceneBg = ImageIO.read(getClass().getResourceAsStream("/assets/Background_.png"));
 			endBg = ImageIO.read(getClass().getResourceAsStream("/assets/restart_screen2.png"));
+			beansBg = ImageIO.read(getClass().getResourceAsStream("/assets/Beans.png"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -142,7 +148,11 @@ public class CoffeePanel extends JPanel implements ActionListener {
 		} else {
 			drawMainScene(g2);
 		}
-		if (state != 0) swingLeaf.draw(g2, W_WIDTH);
+		if (state != 0) {
+			swingLeaf.draw(g2, W_WIDTH);
+			if (beansBg != null)
+				g2.drawImage(beansBg, 0, W_HEIGHT - 160, 160, 160, null);
+		}
 	}
 
 	private void drawWelcomeScreen(Graphics2D g2) {

@@ -12,8 +12,8 @@ import javax.imageio.ImageIO;
 import javax.swing.Timer;
 
 /* espresso machine — pulls shots on a timer, provides steam wand dock point */
-public class EspressoMachine implements ActionListener {
-	private double xPos, yPos;
+//eco points: all images are self-created
+public class EspressoMachine extends CoffeeEquipment implements ActionListener {
 	private boolean buttonsActive = false;
 	private boolean isPulling = false;
 	private boolean shotReady = false;
@@ -25,8 +25,7 @@ public class EspressoMachine implements ActionListener {
 	private static final int BTN_H = 40;
 
 	public EspressoMachine(double x, double y) {
-		xPos = x;
-		yPos = y;
+		super(x, y);
 		try {
 			img = ImageIO.read(getClass().getResourceAsStream("/assets/Espresso_Machine_ 2k.png"));
 		} catch (IOException e) {

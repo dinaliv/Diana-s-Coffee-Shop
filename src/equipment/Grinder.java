@@ -10,17 +10,16 @@ import javax.imageio.ImageIO;
 import javax.swing.Timer;
 
 /* coffee grinder — grinds beans on a timer when portafilter is docked */
-public class Grinder implements ActionListener {
+//eco points: all images are self-created
+public class Grinder extends CoffeeEquipment implements ActionListener {
 
-	private double xPos, yPos;
 	private boolean isGrinding = false;
 	private boolean grindDone = false;
 	private Timer grindTimer;
 	private BufferedImage img;
 
 	public Grinder(double x, double y) {
-		xPos = x;
-		yPos = y;
+		super(x, y);
 		try {
 			img = ImageIO.read(getClass().getResourceAsStream("/assets/Grinder.png"));
 		} catch (IOException e) {
