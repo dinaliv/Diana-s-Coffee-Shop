@@ -8,6 +8,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 /* latte mug — receives espresso and steamed milk to complete the drink */
+//eco points: all images are self-created
 public class Mug {
 	private double xPos, yPos;
 	private boolean hasEspresso = false;
@@ -47,15 +48,12 @@ public class Mug {
 		return yPos;
 	}
 
+	/* draws only the mug image — drink layers are added by MugDecorator subclasses */
 	public void draw(Graphics2D g2) {
 		if (img != null) {
 			g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 			g2.drawImage(img, (int)(xPos - IMG_SIZE / 2), (int)(yPos - IMG_SIZE / 2), IMG_SIZE, IMG_SIZE, null);
 			g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-		}
-		if (hasEspresso) {
-			g2.setColor(new Color(80, 40, 10));
-			g2.fillOval((int)(xPos - 17), (int)(yPos - 57), 48, 48);
 		}
 	}
 }

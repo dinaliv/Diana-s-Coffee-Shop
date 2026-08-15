@@ -19,11 +19,15 @@ import java.awt.event.MouseMotionAdapter;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.Timer;
+import drinkware.BaseMugLayer;
 import drinkware.Cup;
 import drinkware.CoffeeItemFactory;
 import drinkware.DraggableItem;
+import drinkware.EspressoLayerDecorator;
 import drinkware.ItemFactory;
+import drinkware.MilkFoamDecorator;
 import drinkware.Mug;
+import drinkware.MugDrawable;
 import drinkware.Pitcher;
 import java.util.ArrayList;
 import effects.LatteArt;
@@ -68,6 +72,7 @@ public class CoffeePanel extends JPanel implements ActionListener {
 	private Pitcher pitcher;
 	private SteamEffect steamEffect;
 	private Mug mug;
+	private MugDrawable mugLayer;
 
 	private ArrayList<DraggableItem> draggables;
 	private ItemFactory itemFactory;
@@ -101,6 +106,7 @@ public class CoffeePanel extends JPanel implements ActionListener {
 		grinder = (Grinder) equipmentFactory.createEquipment("grinder", 500, 380);
 		espressoMachine = (EspressoMachine) equipmentFactory.createEquipment("espressomachine", 790, 365);
 		mug = new Mug(W_WIDTH / 2 + 70, COUNTER_Y + 150);
+		mugLayer = new BaseMugLayer(mug);
 
 		itemFactory = new CoffeeItemFactory();
 		portafilter = (Portafilter) itemFactory.createItem("portafilter", 190, 590);
@@ -221,7 +227,7 @@ public class CoffeePanel extends JPanel implements ActionListener {
 		portafilter.draw(g2);
 
 		if (state == 9 || state == 10) {
-			mug.draw(g2);
+			mugLayer.draw(g2);
 		}
 		if (state >= 6) {
 			pitcher.draw(g2);
@@ -353,9 +359,10 @@ public class CoffeePanel extends JPanel implements ActionListener {
 
 			portafilter.setDragging(false);
 
-			// cup poured into mug
+			// cup poured into mug — wrap EspressoLayerDecorator at runtime
 			if (state == 9 && cup.isDragging() && cup.hitMug(mug)) {
 				mug.addEspresso();
+				mugLayer = new EspressoLayerDecorator(mugLayer, mug);
 				state = 10;
 			}
 			cup.setDragging(false);
@@ -387,9 +394,10 @@ public class CoffeePanel extends JPanel implements ActionListener {
 				state = 9;
 			}
 
-			// pitcher poured into mug
+			// pitcher poured into mug — wrap MilkFoamDecorator at runtime
 			if (state == 10 && pitcher.isDragging() && pitcher.hitMug(mug)) {
 				mug.addLatte();
+				mugLayer = new MilkFoamDecorator(mugLayer, mug);
 				state = 11;
 			}
 
